@@ -2,6 +2,8 @@
 Console.WriteLine("----------------------");
 Console.WriteLine();
 
+List<string> memory = new();
+
 Calc.AskOperator();
 string? operatorInput = Console.ReadLine();
 while(operatorInput != "a" && operatorInput != "s" && operatorInput != "m" && operatorInput != "d")
@@ -14,7 +16,8 @@ while(operatorInput != "a" && operatorInput != "s" && operatorInput != "m" && op
 double num1 = Calc.AskNumber();
 double num2 = Calc.AskNumber();
 double result = Calc.Evaluate(operatorInput, num1, num2);
-Console.WriteLine(result);
+Calc.AddToMemory(memory,operatorInput, num1, num2, result);
+Console.WriteLine(memory.Last());
 
 
 class Calc
@@ -72,6 +75,12 @@ class Calc
                 Console.WriteLine("Error occured during evaluation");
                 return 0;
         }
+    }
+
+    public static void AddToMemory(List<string> list, string operatorInput, double x, double y, double result)
+    {
+        string op = operatorInput == "a" ? "+" : operatorInput == "s" ? "-" : operatorInput == "m" ? "*" : "/";
+        list.Add($"{x} {op} {y} = {result}");
     }
 }
 
