@@ -2,14 +2,14 @@
 Console.WriteLine("----------------------");
 Console.WriteLine();
 
-List<string> memory = new();
+Calc calc = new Calc();
 
 bool runAgain = false;
 do
 {
     Calc.AskOperator();
     string? operatorInput = Console.ReadLine();
-    while (operatorInput != "a" && operatorInput != "s" && operatorInput != "m" && operatorInput != "d")
+    while (operatorInput != "a" && operatorInput != "s" && operatorInput != "m" && operatorInput != "d" && operatorInput != "p")
     {
         Console.WriteLine("Invalid choice.");
         Calc.AskOperator();
@@ -18,12 +18,25 @@ do
 
     }
 
-    double num1 = Calc.AskNumber();
-    double num2 = Calc.AskNumber();
-    double result = Calc.Evaluate(operatorInput, num1, num2);
-    Calc.AddToMemory(memory, operatorInput, num1, num2, result);
-    Console.WriteLine(memory.Last());
-    Console.WriteLine($"Operations performed this session: {memory.Count}");
+    if(operatorInput == "p")
+    {
+        if (calc.memory.Count > 0)
+            calc.DisplayMemory();
+        else
+        {
+            Console.WriteLine("Currently no operations in memory :(");
+        }
+    }
+    else
+    {
+        double num1 = calc.AskNumber();
+        double num2 = calc.AskNumber();
+        double result = Calc.Evaluate(operatorInput, num1, num2);
+        Calc.AddToMemory(calc.memory, operatorInput, num1, num2, result);
+        Console.WriteLine(calc.memory.Last());
+        Console.WriteLine($"Operations performed this session: {calc.memory.Count}");
+    }
+    
     Console.WriteLine("Would you like to perform another operation? y/n");
     string? response = Console.ReadLine();
     if(response != null) response = response.Trim().ToLower();
@@ -35,6 +48,7 @@ Console.WriteLine("Goodbye!");
 
 class Calc
 {
+    public List<string> memory = new();
     public static void AskOperator()
     {
         Console.WriteLine("Please select from the following");
@@ -42,18 +56,40 @@ class Calc
         Console.WriteLine("\ts - Subtraction");
         Console.WriteLine("\tm - Multiplication");
         Console.WriteLine("\td - Division");
+        Console.WriteLine();
+        Console.WriteLine("\tp - List previous operations");
     }
 
-    public static double AskNumber()
+    public double AskNumber()
     {
-        Console.WriteLine("Please enter a number:");
+        Console.WriteLine("Please enter a number or enter 'a' to display current operations or 'p' to use previous operation:");
         string? input = Console.ReadLine();
         double num;
-        while (!Double.TryParse(input, out num))
+        while (!Double.TryParse(input, out num) && input != "a" && input != "p")
         {
             Console.WriteLine("Please enter a VALID number:");
             input = Console.ReadLine();
         }
+        if(input == "a")
+        {
+            Console.WriteLine("Please select from the following:"); 
+            DisplayMemory();
+            string? indexInput = Console.ReadLine();
+            int memoryIndex;
+            while(int.TryParse(indexInput, out memoryIndex) && (memoryIndex < 1 || memoryIndex > memory.Count))
+            {
+                Console.WriteLine("Please pick a valid option: ");
+                indexInput = Console.ReadLine();
+            }
+            int equalIndex = memory[memoryIndex - 1].IndexOf("=");
+            num = double.Parse(memory[memoryIndex - 1].Substring(equalIndex + 2));
+        } else if(input == "p")
+        {
+            int equalIndex = memory.Last().IndexOf("=");
+            num = double.Parse(memory.Last().Substring(equalIndex + 2));
+        }
+        
+
         return num;
     }
     public static double Add(double x, double y) => x + y;
@@ -94,6 +130,15 @@ class Calc
     {
         string op = operatorInput == "a" ? "+" : operatorInput == "s" ? "-" : operatorInput == "m" ? "*" : "/";
         list.Add($"{x} {op} {y} = {result}");
+    }
+
+    public void DisplayMemory()
+    {
+        if(memory.Count > 0)
+        for(int i = 0; i < memory.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}: {memory[i]}");
+        }
     }
 }
 
