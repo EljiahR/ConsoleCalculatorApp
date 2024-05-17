@@ -4,20 +4,33 @@ Console.WriteLine();
 
 List<string> memory = new();
 
-Calc.AskOperator();
-string? operatorInput = Console.ReadLine();
-while(operatorInput != "a" && operatorInput != "s" && operatorInput != "m" && operatorInput != "d")
+bool runAgain = false;
+do
 {
-    Console.WriteLine("Invalid choice.");
     Calc.AskOperator();
-    operatorInput = Console.ReadLine();
-}
+    string? operatorInput = Console.ReadLine();
+    while (operatorInput != "a" && operatorInput != "s" && operatorInput != "m" && operatorInput != "d")
+    {
+        Console.WriteLine("Invalid choice.");
+        Calc.AskOperator();
+        operatorInput = Console.ReadLine();
+        if (operatorInput != null) operatorInput = operatorInput.Trim().ToLower();
 
-double num1 = Calc.AskNumber();
-double num2 = Calc.AskNumber();
-double result = Calc.Evaluate(operatorInput, num1, num2);
-Calc.AddToMemory(memory,operatorInput, num1, num2, result);
-Console.WriteLine(memory.Last());
+    }
+
+    double num1 = Calc.AskNumber();
+    double num2 = Calc.AskNumber();
+    double result = Calc.Evaluate(operatorInput, num1, num2);
+    Calc.AddToMemory(memory, operatorInput, num1, num2, result);
+    Console.WriteLine(memory.Last());
+    Console.WriteLine($"Operations performed this session: {memory.Count}");
+    Console.WriteLine("Would you like to perform another operation? y/n");
+    string? response = Console.ReadLine();
+    if(response != null) response = response.Trim().ToLower();
+    runAgain = response == "y";
+} while(runAgain);
+Console.WriteLine("Goodbye!");
+
 
 
 class Calc
